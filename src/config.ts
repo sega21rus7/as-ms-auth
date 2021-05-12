@@ -5,4 +5,7 @@ export default () => ({
   POSTGRES_USER: process.env.POSTGRES_USER || 'postgres',
   POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD || 'server',
   POSTGRES_DB: process.env.POSTGRES_DB || 'as-ms-auth',
+  JWT_SECRET: process.env.JWT_SECRET || 'jwt',
+  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '24h',
+  BCRYPT_SALT: process.env.BCRYPT_SALT || '228',
 });
