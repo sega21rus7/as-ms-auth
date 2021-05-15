@@ -1,4 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { EventPattern } from '@nestjs/microservices';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthService } from './auth.service';
 
@@ -6,12 +7,14 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private authService: AuthService) { }
 
-  @Post('login')
+  @EventPattern('login')
+  // @Post('login')
   login(@Body() dto: CreateUserDto) {
     return this.authService.login(dto);
   }
 
-  @Post('register')
+  @EventPattern('register')
+  // @Post('register')
   register(@Body() dto: CreateUserDto) {
     return this.authService.register(dto);
   }

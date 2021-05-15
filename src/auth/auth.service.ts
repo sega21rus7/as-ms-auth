@@ -1,10 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/users.model';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {
@@ -20,11 +21,11 @@ export class AuthService {
       user = await this.usersService.getByLogin(dto.login);
     }
     if (!user) {
-      throw new HttpException('Пользователь с данным email/логином не зарегистрирован', HttpStatus.UNAUTHORIZED);
+      throw new RpcException('Пользователь с данным email/логином не зарегистрирован');
     }
     const passEquals = await bcrypt.compare(dto.password, user.password);
     if (!passEquals) {
-      throw new HttpException('Неверный email/логин или пароль', HttpStatus.BAD_REQUEST);
+      throw new RpcException('Неверный email/логин или пароль');
     }
     return this.generateToken(user);
   }
@@ -32,11 +33,11 @@ export class AuthService {
   async register(dto: CreateUserDto) {
     let candidate = await this.usersService.getByEmail(dto.email);
     if (candidate) {
-      throw new HttpException("Пользователь с таким email уже существует", HttpStatus.BAD_REQUEST);
+      throw new RpcException("Пользователь с таким email уже существует");
     }
     candidate = await this.usersService.getByLogin(dto.login);
     if (candidate) {
-      throw new HttpException("Пользователь с таким логином уже существует", HttpStatus.BAD_REQUEST);
+      throw new RpcException("Пользователь с таким логином уже существует");
     }
     const salt = bcrypt.genSalt(+this.configService.get<string>('BCRYPT_SALT'));
     const encodedPassword = await bcrypt.hash(dto.password, +salt);
