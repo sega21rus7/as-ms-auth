@@ -5,7 +5,33 @@ import { Role } from './roles.model';
 
 @Injectable()
 export class RolesService {
-  constructor(@InjectModel(Role) private roleRepository: typeof Role) { }
+  constructor(@InjectModel(Role) private roleRepository: typeof Role) {
+    this.initialize();
+  }
+
+  private async initialize() {
+    const count = await this.roleRepository.count();
+    console.log('Инициализация таблицы ролей БД начальными значениями');
+    if (count) {
+      console.log('Таблица ролей БД уже инициализирована');
+      return;
+    }
+    Promise.all([
+      this.create({ name: 'regular' }),
+      this.create({ name: 'admin' }),
+      this.create({ name: 'moderator' }),
+    ])
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(
+          'Не удалось инициализировать таблицу ролей БД начальными значениями\n',
+          err,
+        );
+        process.exit(1);
+      });
+  }
 
   async getAll() {
     return this.roleRepository.findAll();
